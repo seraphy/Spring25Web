@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>SQLの定義</comment>
+
+<!-- ログインが有効か判定する (SpringSecurity) -->
+<entry key="sql.users"><![CDATA[
+	select loginid
+	     , password
+	     , case when failcount < 5 then enabled else 0 end as enabled
+	  from users
+	 where loginid = ?
+]]></entry>
+
+<!-- ログインユーザのロール一覧を取得する -->
+<entry key="sql.authorities"><![CDATA[
+	select loginid
+	     , authority
+	  from authorities
+	 where loginid = ?
+]]></entry>
+
+<!--
+USERSテーブルから指定したloginidのレコードを取得する. 
+-->
+<entry key="users.findByLoginid"><![CDATA[
+select loginid
+     , password
+     , enabled
+     , failcount
+     , lastlogin
+  from users
+ where loginid = :loginid
+]]></entry>
+
+<!--
+USERSテーブルの指定したloginidのレコードを更新する.
+-->
+<entry key="users.update"><![CDATA[
+update users
+   set password = :password
+     , enabled = :enabled
+     , failcount = :failcount
+     , lastlogin = :lastlogin
+ where loginid = :loginid
+]]></entry>
+
+</properties>

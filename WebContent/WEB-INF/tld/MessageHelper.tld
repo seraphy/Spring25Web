@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+	http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+
+	<tlib-version>2.0</tlib-version>
+	<short-name>MessageHelper</short-name>
+
+	<function>
+		<name>message</name>
+		<function-class>spring25web.util.MessageHelper</function-class>
+		<function-signature>java.lang.String getMessage(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<name>messageArgs</name>
+		<function-class>spring25web.util.MessageHelper</function-class>
+		<function-signature>java.lang.String getMessage(java.lang.String, java.lang.String[])</function-signature>
+	</function>
+
+</taglib>

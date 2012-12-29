@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="Spring25Web" version="2.5">
+	<display-name>Spring25Web</display-name>
+
+	<!-- Loads the Spring web application context -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- Webスコープを関連づける -->
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
+	<!-- セキュリティとWEBの連携 -->
+	<listener>
+		<listener-class>org.springframework.security.ui.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+
+	<!-- The master configuration file for this Spring web application -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/config/application-context.xml</param-value>
+	</context-param>
+
+	<!-- The front controller of this Spring Web application,
+	     responsible for handling all application requests -->
+	<servlet>
+		<servlet-name>SpringMVCServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<!-- servlet-context.xmlは使用せず空とし、すべて親のapplication-context.xmlから利用する.  -->
+			<param-name>contextConfigLocation</param-name>
+			<param-value></param-value><!-- /WEB-INF/config/servlet-context.xml -->
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- フィルタ -->
+	<filter>
+		<filter-name>MySpringFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>targetBeanName</param-name>
+			<param-value>mySpringFilter</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Springでのエンコーディング設定 -->
+	<filter>
+		<filter-name>CharsetEncoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Spring Securityのフィルタ設定 -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+
+	<servlet-mapping>
+		<servlet-name>SpringMVCServlet</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<filter-mapping>
+		<filter-name>MySpringFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CharsetEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<session-config>
+		<session-timeout>120</session-timeout>
+	</session-config>
+
+	<welcome-file-list>
+		<!-- Tomcatは、実ディレクトリ位置に空のファイルindex.doがあれば、
+		     「*.do」にマップされたサーブレットに転送できる -->
+		<welcome-file>index.do</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

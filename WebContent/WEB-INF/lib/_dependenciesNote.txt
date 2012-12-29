@@ -1,0 +1,45 @@
+[commons-logging.jar]
+spring frameworkは commons loggingを使用します。
+
+
+[slf4j-api-1.7.2.jar, slf4j-jcl-1.7.2.jar]
+Commons Loggingを用いるSLF4J.
+Apache Tilesがslf4jを用います.
+
+
+[spring-aop.jar]
+ AOPのために必要です
+
+[spring-webmvc.jar]
+spring mvcのために必要です。
+
+
+[commons-fileupload.jar]
+ ファイルアップロードのために org.springframework.web.multipart.commons.CommonsMultipartResolver
+ を使う場合には、commons-fileupload.jar, commons-io.jar が必要となります。
+
+
+[JSTLを使うために]
+ standard.jar, jstl.jar が lib上に必要となります。
+ TLDはlib上のjarから動的に読み込まれます.
+
+
+[Spring Security + TAGLIB + ANNOTATIONを使うために]
+ aspectjrt-1.5.4.jar
+ spring-security-core-2.0.5.RELEASE.jar
+ spring-security-core-tiger-2.0.5.RELEASE.jar
+ spring-security-taglibs-2.0.5.RELEASE.jar
+ commons-codec-1.7.jar (passwordEncoderでbase64/hex処理するため)
+ が必要になります。
+
+
+[apache derbyをembeddedで用いる場合]
+ derby.jar
+ derbyLocale_ja_JP.jar
+ derbytools.jar  (ijでsqlを流す場合)
+ が必要になります。
+
+
+[cglib-nodep-2.1_3.jar]
+spring-tx.jarでトランザクションを宣言的に用いる場合に必要となります。
+

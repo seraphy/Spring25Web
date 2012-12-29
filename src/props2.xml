@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>prop2 MultiProperties.javaで用いるデモ用</comment>
+<entry key="data2">bbbb</entry>
+<entry key="data3">bbbb</entry>
+</properties>

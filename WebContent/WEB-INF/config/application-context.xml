@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:sec="http://www.springframework.org/schema/security"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:util="http://www.springframework.org/schema/util"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-2.0.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security-2.0.2.xsd">
+
+	<!-- アノテーションによる設定の有効化 -->
+	<context:annotation-config/>
+
+	<!-- アノテーションによるコンポーネント登録 -->
+	<context:component-scan base-package="spring25web" resource-pattern="**/*.class"/>
+
+	<!-- アノテーションによるトランザクション対象の登録 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<!-- アノテーションによるセキュリティの設定の有効化 -->
+	<sec:global-method-security secured-annotations="enabled" jsr250-annotations="enabled"/>
+
+	<!-- SQL定義プロパティの読み込み -->
+	<util:properties id="sqls" location="classpath:sqls.xml"/>
+
+	<!-- Propertiesのファクトリを用いて、外部プロパティと、このファイル中で定数とを結合する. -->
+	<bean id="configProps" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="propertiesArray">
+			<list>
+				<ref bean="sqls"/>
+				<props>
+				</props>
+			</list>
+		</property>
+	</bean>
+
+	<!-- このコンテキスト中で使用する置換変数用のプロパティのBean名 -->
+	<context:property-placeholder properties-ref="configProps"/>
+
+	<!-- Apache Derbyの起動・停止 管理ビーン -->
+	<bean id="derbyInitiator" class="spring25web.util.DerbyInitiator">
+		<property name="databaseHome" value="/WEB-INF"/>
+		<property name="databaseLocation" value="/WEB-INF/derbyDb"/>
+		<property name="requiredTableNames" value="users,authorities"/>
+		<property name="initScript" value="/WEB-INF/initScript.sql"/>
+		<property name="properties">
+			<props>
+				<prop key="derby.stream.error.method">spring25web.util.DerbyInitiator.createLogWriter</prop>
+				<prop key="derby.language.logStatementText">true</prop>
+				<prop key="derby.language.logQueryPlan">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- データソース -->
+	<bean id="dataSource" factory-bean="derbyInitiator" factory-method="getDataSource"/>
+
+	<!-- Spring Securityのデータベース -->
+	<sec:authentication-provider>
+		<!-- jdbcによるusers(username,password),authorities(username,authority)テーブルからの読み込み -->
+		<sec:jdbc-user-service data-source-ref="dataSource"
+			users-by-username-query="${sql.users}"
+			authorities-by-username-query="${sql.authorities}"/>
+		<sec:password-encoder ref="passwordEncoder">
+			<!-- ユーザ名をパスワードハッシュのソルトとして使用する -->
+			<sec:salt-source user-property="username"/>
+		</sec:password-encoder>
+
+		<!-- インメモリデータベース -->
+		<!--
+		<sec:user-service>
+			<sec:user password="admin" name="admin" authorities="ROLE_USER,ROLE_ADMINISTRATOR"/>
+			<sec:user password="user"  name="user"  authorities="ROLE_USER"/>
+			<sec:user password="guest" name="guest" authorities="ROLE_GUEST"/>
+		</sec:user-service>
+		-->
+	</sec:authentication-provider>
+
+	<!-- パスワードはSHA(512)でハッシュ化する
+		 64バイト(8 * 64 = 512)の長さ。パスワードは16進数表現するため128文字分の長さとなる。
+	 -->
+	<bean id="passwordEncoder" class="org.springframework.security.providers.encoding.ShaPasswordEncoder">
+		<constructor-arg value="512"/>
+	</bean>
+
+	<!-- トランザクションマネージャ -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- コントローラの登録をアノテーションよりマッピングする -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="requestInterceptor"/>
+			</list>
+		</property>
+    </bean>
+
+	<!-- ビーン定義のコントローラ のマッピング-->
+	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="requestInterceptor"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ビューリゾルバー -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+ 	</bean>
+
+	<!-- XMLファイルによるビューリゾルバー定義 -->
+	<bean class="org.springframework.web.servlet.view.XmlViewResolver">
+		<property name="order" value="1"/>
+		<property name="location" value="/WEB-INF/config/view-resolver.xml"/>
+	</bean>
+
+	<!-- エラーマッピング -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="order" value="1" />
+		<property name="exceptionMappings" >
+			<props>
+				<prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">err/error_maxUploadSizeExceeded</prop>
+				<prop key="org.springframework.web.HttpSessionRequiredException">err/error_sessionExpired</prop>
+				<prop key="org.springframework.security.AccessDeniedException">err/error_unauth</prop>
+			</props>
+		</property>
+		<property name="defaultErrorView" value="err/error_generic"/>
+		<property name="exceptionAttribute" value="exception"/>
+		<property name="warnLogCategory" value="spring25web.util.SimpleMappingExceptionResolver"/>
+	</bean>
+
+	<!-- アップロード対応 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- the maximum file size in bytes (25MB) -->
+		<property name="maxUploadSize" value="25000000" />
+		<!-- Saves temporary files to the servlet container's temporary directory. -->
+		<property name="uploadTempDir" value="#{ systemProperties['java.io.tmpdir'] }/Spring25Web/upload"/>
+	</bean>
+
+	<!-- メッセージソース  (IDは"messageSource"であること)-->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="WEB-INF/messages" />
+	</bean>
+
+	<!-- ページごとのセキュリティの設定  -->
+	<sec:http auto-config="true"> <!-- access-denied-page="/unauthError.do" -->
+		<sec:intercept-url pattern="/login/*" filters="none"/>
+		<sec:intercept-url pattern="/upload/*" access="ROLE_USER"/>
+		<sec:intercept-url pattern="/admin/*" access="ROLE_ADMINISTRATOR"/>
+
+		<sec:form-login login-page="/login/login.jsp" authentication-failure-url="/login/login.jsp?login_error=1"/>
+		<sec:logout logout-url="/logout" logout-success-url="/index.do" invalidate-session="true"/>
+		<!--
+		  ユーザごとにセッションを1つに限定する場合は
+		<sec:concurrent-session-control max-sessions="1" expired-url="/concurrentSessionError.do"/>
+		-->
+		<sec:anonymous />
+	</sec:http>
+
+	<!-- 非同期実行（バッチ起動用）
+	  executorをinjectionして利用する
+	-->
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="25" />
+	</bean>
+
+	<!-- スケジューラ -->
+	<bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
+		<property name="continueScheduledExecutionAfterException" value="true"/>
+		<property name="scheduledExecutorTasks">
+			<list>
+				<bean class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
+					<property name="period" value="10000"/>
+					<property name="runnable" ref="repeatTask"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- アノテーションを使わないBean定義例 -->
+	<bean id="props" class="spring25web.util.MultiProperties">
+		<constructor-arg>
+			<list>
+				<util:properties location="classpath:props1.xml"/>
+				<util:properties location="classpath:props2.xml"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+</beans>
