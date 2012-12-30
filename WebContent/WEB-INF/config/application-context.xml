@@ -118,18 +118,27 @@ http://www.springframework.org/schema/security/spring-security-2.0.2.xsd">
 		</property>
 	</bean>
 
-	<!-- ビューリゾルバー -->
+	<!-- BEAN名によるリゾルバ定義 -->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<!-- Values for the order property are usually specified in the range 0 .. Integer.MAX_VALUE. -->
+		<property name="order" value="0"/>
+	</bean>
+
+	<!-- XMLファイルによるビューリゾルバー定義 -->
+	<!-- 
+	<bean class="org.springframework.web.servlet.view.XmlViewResolver">
+		<property name="order" value="0"/>
+		<property name="location" value="/WEB-INF/config/view-resolver.xml"/>
+	</bean>
+	-->
+
+	<!-- URLによるビューリゾルバー -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="1"/>
 		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
 		<property name="prefix" value="/WEB-INF/jsp/"/>
 		<property name="suffix" value=".jsp"/>
  	</bean>
-
-	<!-- XMLファイルによるビューリゾルバー定義 -->
-	<bean class="org.springframework.web.servlet.view.XmlViewResolver">
-		<property name="order" value="1"/>
-		<property name="location" value="/WEB-INF/config/view-resolver.xml"/>
-	</bean>
 
 	<!-- エラーマッピング -->
 	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
