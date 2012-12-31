@@ -19,14 +19,13 @@ import spring25web.service.AccountService;
  * アカウント制御コントローラ
  */
 @Controller
-@RequestMapping("/admin/account.do")
-public class AccountController {
+@RequestMapping("/admin/changepassword.do")
+public class ChangePasswordController {
 
     /**
      * ログ
      */
     private final Logger log = LoggerFactory.getLogger(getClass());
-
 
     /**
      * アカウント制御サービス
@@ -39,10 +38,15 @@ public class AccountController {
      * GETアクセス.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView handleInitRequest() {
+    public ModelAndView handleInitRequest(@RequestParam("loginid") String loginid) {
         log.debug("handleInitRequest");
 
+        if (loginid == null || loginid.trim().length() == 0) {
+            throw new IllegalArgumentException();
+        }
+        
         ModelAndView model = new ModelAndView();
+        model.addObject("loginid", loginid);
 
         return model;
     }
@@ -55,7 +59,6 @@ public class AccountController {
             @RequestParam("loginid") String loginid,
             @RequestParam("password") String password) throws IOException {
         log.debug("handleUploadRequest");
-
 
         String hash = accountService.changePassword(loginid, password);
 

@@ -55,7 +55,7 @@ public class BackgroundJobController {
 
         final int mx = 50;
         
-        taskExecutor.execute(new Runnable() {
+        Runnable job = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -63,13 +63,16 @@ public class BackgroundJobController {
                         log.info("background " + idx + "/" + mx);
                         Thread.sleep(100);
                     }
+                    
                     log.info("background done.");
 
-                } catch (InterruptedException e) {
-                    log.info("interrupted", e);
+                } catch (Exception ex) {
+                    log.info("error in bgJob: " + ex, ex);
                 }
             }
-        });
+        };
+        
+        taskExecutor.execute(job);
         
         model.addObject("message", "accepted.");
         return model;

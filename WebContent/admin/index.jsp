@@ -10,7 +10,8 @@
 <h1>admin</h1>
 
 <ul>
-<li><a href='<c:url value="/admin/account.do"/>'>account</a></li>
+<li><a href='<c:url value="/admin/accountlist.do"/>'>list accounts</a></li>
+<li><a href='<c:url value="/"/>'>return</a></li>
 </ul>
 
 </body>

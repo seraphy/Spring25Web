@@ -24,7 +24,7 @@ public class User implements Serializable {
 	/**
 	 * 有効フラグ
 	 */
-	private int enabled;
+	private boolean enabled;
 
 	/**
 	 * 連続失敗数
@@ -53,11 +53,11 @@ public class User implements Serializable {
 		this.password = password;
 	}
 
-	public int getEnabled() {
+	public boolean getEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(int enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 

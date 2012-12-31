@@ -75,11 +75,11 @@ public class UserDao {
 		params.put("loginid", loginid);
 
 		if (log.isDebugEnabled()) {
-			log.info("sql=" + sql + "/param=" + params);
+			log.debug("sql=" + sql + "/param=" + params);
 		}
 		List<User> users = this.jdbcTempl.query(sql, USER_ROWMAPPER, params);
 		if (log.isDebugEnabled()) {
-			log.info("findByLoginid(results)=" + users);
+			log.debug("findByLoginid(results)=" + users);
 		}
 		if (users.size() == 0) {
 			return null;
@@ -88,6 +88,22 @@ public class UserDao {
 		return users.get(0);
 	}
 
+    /**
+     * ユーザ情報の取得.
+     *
+     * @param loginid ログインID
+     * @return ユーザ情報、なければnull
+     */
+    public List<User> selectAll() {
+        String sql = sqls.getProperty("users.selectAll");
+
+        List<User> users = this.jdbcTempl.query(sql, USER_ROWMAPPER);
+        if (log.isDebugEnabled()) {
+            log.debug("selectAll(results)=" + users);
+        }
+
+        return users;
+    }
 
 	/**
 	 * 更新を行います.
@@ -105,12 +121,12 @@ public class UserDao {
 		Map<String, Object> args = BeanPropertyUtils.getProperties(user);
 
 		// SQL実行
-		if (log.isDebugEnabled()) {
+		if (log.isInfoEnabled()) {
 			log.info("sql=" + sql + "/params=" + args);
 		}
 
 		int numOfRows = this.jdbcTempl.update(sql, args);
-		log.debug("update(result)=" + numOfRows);
+		log.info("update(result)=" + numOfRows);
 
 		if (numOfRows != 1) {
 			throw new IncorrectResultSizeDataAccessException(1, numOfRows);

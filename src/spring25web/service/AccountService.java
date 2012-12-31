@@ -1,6 +1,7 @@
 package spring25web.service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,15 +36,19 @@ public class AccountService {
 
     /**
      * パスワードを更新する.
+     * 連続失敗回数はゼロにリセットされます.
      * @param loginid  ログインID
      * @param password パスワード(ハッシュ前)
      * @return 更新された場合は生成されたハッシュ値、そうでなければnull
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
     public String changePassword(String loginid, String password) {
-		if (loginid == null || loginid.length() == 0 ||
-				password == null || password.length() == 0) {
+		if (loginid == null || loginid.length() == 0) {
 			throw new IllegalArgumentException();
+		}
+
+		if (password == null) {
+		    password = "";
 		}
 
 		User user = userDao.findByLoginid(loginid);
@@ -54,6 +59,7 @@ public class AccountService {
 		// パスワードエンコーダとソルトソースを指定してハッシュ値を計算する.
         String hash = passwordEncoder.encodePassword(password, loginid);
 
+        user.setFailcount(0);
         user.setPassword(hash);
 
         userDao.update(user);
@@ -89,5 +95,14 @@ public class AccountService {
         }
 
         userDao.update(user);
+    }
+    
+    /**
+     * すべてのユーザを取得します.
+     * loginid順.
+     * @return すべてのユーザのリスト、なければ空
+     */
+    public List<User> selectAll() {
+        return userDao.selectAll();
     }
 }

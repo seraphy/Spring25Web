@@ -3,4 +3,8 @@
 <properties>
 <comment>messages</comment>
 <entry key="greeting">Hello, World!</entry>
+
+<entry key="required">Required</entry>
+<entry key="required.fileData">File must be specified.</entry>
+
 </properties>

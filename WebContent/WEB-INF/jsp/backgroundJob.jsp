@@ -15,5 +15,7 @@
 <input type="submit" name="doBackground" value="Do BackgroundJob">
 </form>
 
+<a href='<c:url value="/"/>'>return</a>
+
 </body>
 </html>

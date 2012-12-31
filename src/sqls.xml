@@ -34,6 +34,20 @@ select loginid
 ]]></entry>
 
 <!--
+USERSテーブルから指定した全てのloginidのレコードを取得する. 
+-->
+<entry key="users.selectAll"><![CDATA[
+select loginid
+     , password
+     , enabled
+     , failcount
+     , lastlogin
+  from users
+ order by
+       loginid
+]]></entry>
+
+<!--
 USERSテーブルの指定したloginidのレコードを更新する.
 -->
 <entry key="users.update"><![CDATA[

@@ -52,9 +52,15 @@ public class ChecksumController {
 
 		if (!result.hasErrors()) {
 			CommonsMultipartFile file = form.getFileData();
-			Long crc32 = calculate(file);
-			if (crc32 != null) {
-				form.setChecksum(crc32);
+			if (file.isEmpty()) {
+			    // ファイルがない場合
+			    result.rejectValue("fileData", "required");
+
+			} else {
+    			Long crc32 = calculate(file);
+    			if (crc32 != null) {
+    				form.setChecksum(crc32);
+    			}
 			}
 		}
 
@@ -75,27 +81,39 @@ public class ChecksumController {
 
 		if (!result.hasErrors()) {
 			CommonsMultipartFile file = form.getFileData();
-			Long crc32 = calculate(file);
-			if (crc32 != null) {
-				// 出力ファイル名
-				String fileName = form.getName();
-				if (fileName == null || fileName.trim().length() == 0) {
-					fileName = file.getName();
-				}
-				if (fileName == null || fileName.trim().length() == 0) {
-					fileName = "不明.txt";
-				}
+            if (file.isEmpty()) {
+                // ファイルがない場合
+                result.rejectValue("fileData", "required");
 
-				// モデルに設定し、ビューに遷移
-				model.addObject("crc32", crc32);
-				model.addObject("fileName", fileName);
-				model.setViewName("reportUploadFileCrc32View");
-			}
+            } else {
+    			Long crc32 = calculate(file);
+    			if (crc32 != null) {
+    				// 出力ファイル名
+    				String fileName = form.getName();
+    				if (fileName == null || fileName.trim().length() == 0) {
+    					fileName = file.getName();
+    				}
+    				if (fileName == null || fileName.trim().length() == 0) {
+    					fileName = "不明.txt";
+    				}
+    
+    				// モデルに設定し、ビューに遷移
+    				model.addObject("crc32", Long.toHexString(crc32));
+    				model.addObject("fileName", fileName);
+    				model.setViewName("reportUploadFileCrc32View");
+    			}
+            }
 		}
 
 		return model;
 	}
 
+	/**
+	 * CRC32を計算する.
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
 	protected Long calculate(CommonsMultipartFile file) throws IOException {
 		if (file != null) {
 			log.info("storageDescription=" + file.getStorageDescription());

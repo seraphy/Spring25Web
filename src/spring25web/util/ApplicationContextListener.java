@@ -81,6 +81,9 @@ public class ApplicationContextListener implements ApplicationListener {
         String loginid = evt.getAuthentication().getName();
         log.info("login failed loginid=" + loginid);
         
+        // ログインに失敗した場合は連続失敗回数のカウントをアップする.
+        // ただし、ログインsqlにより、連続失敗回数が閾値を越えるとenabled = falseと扱われるようになるため、
+        // その場合は AuthenticationFailureDisabledEvent となり、連続失敗回数のカウントは超えた時点で止まる.
         accountService.login(loginid, false);
     }
 }

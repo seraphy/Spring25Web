@@ -3,4 +3,8 @@
 <properties>
 <comment>messages</comment>
 <entry key="greeting">こんにちは、世界!</entry>
+
+<entry key="required">必須です.</entry>
+<entry key="required.fileData">ファイルは必ず指定する必要があります.</entry>
+
 </properties>
