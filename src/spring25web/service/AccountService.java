@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.annotation.Secured;
 import org.springframework.security.providers.encoding.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import spring25web.dao.UserDao;
 import spring25web.dto.User;
+import spring25web.util.Roles;
 
 
 /**
@@ -42,6 +44,7 @@ public class AccountService {
      * @return 更新された場合は生成されたハッシュ値、そうでなければnull
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+    @Secured(Roles.ROLE_ADMINISTRATOR)
     public String changePassword(String loginid, String password) {
 		if (loginid == null || loginid.length() == 0) {
 			throw new IllegalArgumentException();
@@ -102,6 +105,7 @@ public class AccountService {
      * loginid順.
      * @return すべてのユーザのリスト、なければ空
      */
+    @Secured(Roles.ROLE_ADMINISTRATOR)
     public List<User> selectAll() {
         return userDao.selectAll();
     }

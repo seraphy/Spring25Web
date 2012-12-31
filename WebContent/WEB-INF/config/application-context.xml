@@ -73,6 +73,7 @@ http://www.springframework.org/schema/security/spring-security-2.0.2.xsd">
 		<sec:jdbc-user-service data-source-ref="dataSource"
 			users-by-username-query="${sql.users}"
 			authorities-by-username-query="${sql.authorities}"/>
+
 		<sec:password-encoder ref="passwordEncoder">
 			<!-- ユーザ名をパスワードハッシュのソルトとして使用する -->
 			<sec:salt-source user-property="username"/>
@@ -169,11 +170,13 @@ http://www.springframework.org/schema/security/spring-security-2.0.2.xsd">
 	</bean>
 
 	<!-- ページごとのセキュリティの設定  -->
-	<sec:http auto-config="true"> <!-- access-denied-page="/unauthError.do" -->
+	<sec:http auto-config="true"
+		access-denied-page="/unauthError.do"><!-- 403 Access Denied時の処理先 -->
+
 		<sec:intercept-url pattern="/login/*" filters="none"/>
 		<sec:intercept-url pattern="/upload/*" access="ROLE_USER"/>
 		<sec:intercept-url pattern="/admin/*" access="ROLE_ADMINISTRATOR"/>
-
+		
 		<sec:form-login login-page="/login/login.jsp" authentication-failure-url="/login/login.jsp?login_error=1"/>
 		<sec:logout logout-url="/logout" logout-success-url="/index.do" invalidate-session="true"/>
 		<!--
@@ -198,8 +201,8 @@ http://www.springframework.org/schema/security/spring-security-2.0.2.xsd">
 		<property name="scheduledExecutorTasks">
 			<list>
 				<bean class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
-					<property name="period" value="10000"/>
-					<property name="runnable" ref="repeatTask"/>
+					<property name="period" value="60000"/>
+					<property name="runnable" ref="repeatTask"/> <!-- @Componentによるビーン名定義 -->
 				</bean>
 			</list>
 		</property>
