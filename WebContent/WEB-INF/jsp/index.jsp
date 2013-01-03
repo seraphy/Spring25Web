@@ -9,13 +9,17 @@
 <body>
 <h1>index.do -- jsp/index.jsp</h1>
 
+<%-- メッセージソースから国際化した文字列を取得する例 --%>
 <p>${msg:message("greeting")}</p>
+
+<%-- 独自タグリブと、ログインユーザの表示例 --%>
 <p>login: <tg:loginName defaultName="**anonymous**"/></p>
 
 <ul>
-<li><a href='<c:url value="/upload/checksum.do"/>'>upload</a></li>
-<li><a href='<c:url value="/backgroundJob.do"/>'>backgroundJob</a></li>
-<li><a href='<c:url value="/admin/index.jsp"/>'>admin ...</a></li>
+<li><a href='<c:url value="/personEdit.do"/>'>personEdit</a> (フォームのバインド例)</li>
+<li><a href='<c:url value="/upload/checksum.do"/>'>upload</a> (権限と、ファイルのアップロード例)</li>
+<li><a href='<c:url value="/backgroundJob.do"/>'>backgroundJob</a> (バックグラウンド処理例)</li>
+<li><a href='<c:url value="/admin/index.jsp"/>'>admin ...</a> (権限と、データベースの更新例)</li>
 <li><a href='<c:url value="/logout"/>'>logout</a></li>
 </ul>
 

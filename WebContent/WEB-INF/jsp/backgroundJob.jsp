@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>index.do</title>
+<title>backgroundJob.do</title>
 </head>
 <body>
 <h1>backgroundJob.do -- jsp/backgroundJob.jsp</h1>
